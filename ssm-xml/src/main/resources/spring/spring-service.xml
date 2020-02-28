@@ -4,10 +4,14 @@
        xsi:schemaLocation="http://www.springframework.org/schema/beans
        http://www.springframework.org/schema/beans/spring-beans.xsd">
 
-    <import resource="spring-datasource.xml"/>
+    <import resource="spring-dao.xml"/>
 
     <bean class="com.iogogogo.ssm.service.impl.UserServiceImpl" id="userService">
-        <constructor-arg name="jdbcTemplate" ref="jdbcTemplate"/>
+        <property name="userDao" ref="userDao"/>
+    </bean>
+
+    <bean id="accountService" class="com.iogogogo.ssm.service.impl.AccountServiceImpl">
+        <constructor-arg name="accountDao" ref="accountDao"/>
     </bean>
 
 </beans>

@@ -1,6 +1,9 @@
 <?xml version="1.0" encoding="UTF-8" ?>
 <configuration scan="true" scanPeriod="20 seconds" debug="false">
 
+    <property name="log.home" value="${user.dir}/logs"/>
+    <property name="app.name" value="ssm-xml"/>
+
     <!-- %m输出的信息,%p日志级别,%t线程名,%d日期,%c类的全名,%i索引【从数字0开始递增】,,, -->
     <!-- appender是configuration的子节点，是负责写日志的组件。 -->
     <!-- ConsoleAppender：把日志输出到控制台 -->
@@ -12,8 +15,32 @@
         </encoder>
     </appender>
 
+    <appender name="FILE_OUT" class="ch.qos.logback.core.rolling.RollingFileAppender">
+        <file>${log.home}/${app.name}.log</file>
+        <encoder>
+            <pattern>%date{ISO8601} [%thread] %-5level [${app.name}] [%logger{100}] [%file:%line] - %msg%n</pattern>
+        </encoder>
+        <rollingPolicy class="ch.qos.logback.core.rolling.TimeBasedRollingPolicy">
+            <fileNamePattern>${log.home}/${app.name}.error.%d{yyyy-MM-dd}.%i.zip</fileNamePattern>
+            <!-- 如果按天来回滚，则最大保存时间为10天，10天之前的都将被清理掉 -->
+            <maxHistory>10</maxHistory>
+            <!-- 日志总保存量为500MB -->
+            <totalSizeCap>500MB</totalSizeCap>
+            <!--文件达到最大50MB时会被压缩和切割 -->
+            <timeBasedFileNamingAndTriggeringPolicy
+                    class="ch.qos.logback.core.rolling.SizeAndTimeBasedFNATP">
+                <!--文件达到 最大50MB时会被压缩和切割 -->
+                <maxFileSize>50MB</maxFileSize>
+            </timeBasedFileNamingAndTriggeringPolicy>
+            <!--<maxFileSize>50MB</maxFileSize>-->
+        </rollingPolicy>
+    </appender>
+
+
+    <logger name="com.iogogogo.ssm.mapper" level="DEBUG"/>
 
     <root level="INFO">  <!-- Options: ERROR, WARN, INFO, DEBUG -->
         <appender-ref ref="STDOUT"/>
+        <appender-ref ref="FILE_OUT"/>
     </root>
 </configuration>

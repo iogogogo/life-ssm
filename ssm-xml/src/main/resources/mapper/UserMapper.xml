@@ -5,7 +5,7 @@
 
     <select id="findAll" resultType="UserEntity">
         select *
-        from `life-ssm`.users;
+        from users;
     </select>
 
 </mapper>

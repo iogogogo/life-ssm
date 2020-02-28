@@ -1,5 +1,7 @@
 package com.iogogogo.ssm.entity;
 
+import com.fasterxml.jackson.annotation.JsonFormat;
+import com.iogogogo.consts.DateTimePattern;
 import lombok.Data;
 
 import java.io.Serializable;
@@ -22,8 +24,10 @@ public class UserEntity implements Serializable {
 
     private String address;
 
+    @JsonFormat(pattern = DateTimePattern.YYYY_MM_DD_HH_MM_SS)
     private LocalDateTime birthday;
 
+    @JsonFormat(pattern = DateTimePattern.YYYY_MM_DD_HH_MM_SS)
     private LocalDateTime updateTime;
 
     private Float weight;

@@ -10,13 +10,13 @@
        http://www.springframework.org/schema/aop https://www.springframework.org/schema/aop/spring-aop.xsd">
 
     <!-- (事务管理)transaction manager, use JtaTransactionManager for global tx -->
-    <bean id="txManager"
+    <bean id="transactionManager"
           class="org.springframework.jdbc.datasource.DataSourceTransactionManager">
-        <property name="dataSource" ref="null"/>
+        <property name="dataSource" ref="hikariDataSource"/>
     </bean>
 
     <!-- 定义事务增强处理 -->
-    <tx:advice id="txAdvice" transaction-manager="txManager">
+    <tx:advice id="txAdvice" transaction-manager="transactionManager">
         <tx:attributes>
             <!-- read-only="true"属性设置提高事务处理性能 -->
             <tx:method name="find*" read-only="true"/>
@@ -51,6 +51,5 @@
         <!-- 将事务增强与切入点组合 -->
         <aop:advisor advice-ref="txAdvice" pointcut-ref="pointcut"/>
     </aop:config>
-
 
 </beans>
