@@ -1,44 +1,17 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <beans xmlns="http://www.springframework.org/schema/beans"
        xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-       xmlns:context="http://www.springframework.org/schema/context"
        xmlns:tx="http://www.springframework.org/schema/tx"
-       xmlns:aop="http://www.springframework.org/schema/aop"
        xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd
-       http://www.springframework.org/schema/tx http://www.springframework.org/schema/tx/spring-tx.xsd
-       http://www.springframework.org/schema/aop http://www.springframework.org/schema/aop/spring-aop.xsd
-       http://www.springframework.org/schema/context http://www.springframework.org/schema/context/spring-context.xsd">
+       http://www.springframework.org/schema/tx http://www.springframework.org/schema/tx/spring-tx.xsd">
 
-    <!-- 加载外部的配置文件 -->
-    <context:property-placeholder location="classpath:jdbc.properties"/>
-
-    <bean id="hikariDataSource" class="com.zaxxer.hikari.HikariDataSource">
-        <property name="jdbcUrl" value="${jdbc.url}"/>
-        <property name="username" value="${jdbc.username}"/>
-        <property name="password" value="${jdbc.password}"/>
-        <property name="driverClassName" value="${jdbc.driver}"/>
-        <property name="poolName" value="TransferHikariCP"/>
-        <property name="connectionTestQuery" value="SELECT 1"/>
-        <!-- 生效超时 -->
-        <property name="validationTimeout" value="3000"/>
-        <!-- 连接只读数据库时配置为true， 保证安全 -->
-        <property name="readOnly" value="false"/>
-        <!-- 等待连接池分配连接的最大时长（毫秒），超过这个时长还没可用的连接则发生SQLException， 缺省:30秒 -->
-        <property name="connectionTimeout" value="60000"/>
-        <!-- 一个连接idle状态的最大时长（毫秒），超时则被释放（retired），缺省:10分钟 -->
-        <property name="idleTimeout" value="60000"/>
-        <!-- 一个连接的生命时长（毫秒），超时而且没被使用则被释放（retired），缺省:30分钟，建议设置比数据库超时时长少30秒，参考MySQL
-            wait_timeout参数（show variables like '%timeout%';） -->
-        <property name="maxLifetime" value="60000"/>
-        <!-- 连接池中允许的最大连接数。缺省值：10；推荐的公式：((core_count * 2) + effective_spindle_count) -->
-        <property name="maximumPoolSize" value="10"/>
-    </bean>
+    <import resource="datasource-hikaricp.xml"/>
 
     <!-- 配置事务管理器 -->
     <bean id="txManager"
           class="org.springframework.jdbc.datasource.DataSourceTransactionManager">
         <!-- 注入数据库连接池 -->
-        <property name="dataSource" ref="hikariDataSource"/>
+        <property name="dataSource" ref="dataSource"/>
     </bean>
 
     <!-- 配置基于注解的声明式事务 -->
@@ -46,14 +19,14 @@
 
     <!-- spring-jdbc-->
     <bean id="jdbcTemplate" class="org.springframework.jdbc.core.JdbcTemplate">
-        <property name="dataSource" ref="hikariDataSource"/>
+        <property name="dataSource" ref="dataSource"/>
     </bean>
 
     <!-- spring mybatis-->
     <!-- 配置SqlSessionFactory对象 -->
     <bean id="sqlSessionFactory" class="org.mybatis.spring.SqlSessionFactoryBean">
         <!-- 注入数据库连接池 -->
-        <property name="dataSource" ref="hikariDataSource"/>
+        <property name="dataSource" ref="dataSource"/>
         <!-- 配置MyBaties全局配置文件:mybatis-config.xml -->
         <property name="configLocation" value="classpath:mybatis-config.xml"/>
         <!-- 扫描entity包 使用别名 -->
@@ -71,49 +44,10 @@
 
 
     <!-- 基于aspectj的aop事务处理  -->
-
     <!-- (事务管理)transaction manager, use JtaTransactionManager for global tx -->
     <bean id="transactionManager"
           class="org.springframework.jdbc.datasource.DataSourceTransactionManager">
-        <property name="dataSource" ref="hikariDataSource"/>
+        <property name="dataSource" ref="dataSource"/>
     </bean>
-
-    <!-- 定义事务增强处理 -->
-    <tx:advice id="txAdvice" transaction-manager="transactionManager">
-        <tx:attributes>
-            <!-- read-only="true"属性设置提高事务处理性能 -->
-            <tx:method name="find*" read-only="true"/>
-            <tx:method name="search*" read-only="true"/>
-            <tx:method name="query*" read-only="true"/>
-            <tx:method name="select*" read-only="true"/>
-            <tx:method name="list*" read-only="true"/>
-            <tx:method name="get*" read-only="true"/>
-
-            <!-- propagation 事务传播机制 -->
-            <tx:method name="add*" propagation="REQUIRED"/>
-            <tx:method name="save*" propagation="REQUIRED"/>
-            <tx:method name="insert*" propagation="REQUIRED"/>
-
-            <tx:method name="del*" propagation="REQUIRED"/>
-            <tx:method name="delete*" propagation="REQUIRED"/>
-            <tx:method name="remove*" propagation="REQUIRED"/>
-            <tx:method name="transfer*" propagation="REQUIRED"/>
-
-            <tx:method name="update*" propagation="REQUIRED"/>
-            <tx:method name="modify*" propagation="REQUIRED"/>
-            <tx:method name="merge*" propagation="REQUIRED"/>
-
-            <tx:method name="do*" propagation="REQUIRED"/>
-            <tx:method name="*" propagation="REQUIRED"/>
-        </tx:attributes>
-    </tx:advice>
-
-
-    <!-- 定义事务处理切面 -->
-    <aop:config>
-        <aop:pointcut expression="execution(* com.iogogogo.ssm.service.impl.*.*(..))" id="pointcut"/>
-        <!-- 将事务增强与切入点组合 -->
-        <aop:advisor advice-ref="txAdvice" pointcut-ref="pointcut"/>
-    </aop:config>
 
 </beans>
