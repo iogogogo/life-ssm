@@ -27,7 +27,7 @@
         <mybatis.version>3.5.4</mybatis.version>
         <mybatis-spring.version>2.0.3</mybatis-spring.version>
         <fileupload.version>1.4</fileupload.version>
-        <jackson.version>2.10.1</jackson.version>
+        <jackson.version>2.13.4.1</jackson.version>
     </properties>
 
     <dependencies>
